@@ -1,1 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國小單字 300 挑戰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8f7f5;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e7e5e4; border-radius: 10px; }
+        
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .animate-bounce-slow { animation: bounce-slow 3s infinite; }
+        
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-slow { animation: pulse-slow 4s infinite; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-stone-700">
 
+    <!-- 背景裝飾 -->
+    <div class="fixed top-10 left-10 text-stone-200 -z-10 animate-pulse-slow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+    </div>
+    <div class="fixed bottom-10 right-10 text-stone-200 -z-10 animate-bounce-slow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+    </div>
+
+    <div id="app" class="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-8 border-stone-100 relative">
+        <!-- 內容會由 JavaScript 動態插入 -->
+    </div>
+
+    <p class="mt-8 text-stone-300 text-[10px] font-bold uppercase tracking-[0.2em]">300 Vocabulary Challenge</p>
+
+    <script>
+        const wordBank = [
+            // Numbers
+            { en: "zero", zh: "零" }, { en: "one", zh: "一" }, { en: "two", zh: "二" }, { en: "three", zh: "三" }, { en: "four", zh: "四" },
+            { en: "five", zh: "五" }, { en: "six", zh: "六" }, { en: "seven", zh: "七" }, { en: "eight", zh: "八" }, { en: "nine", zh: "九" },
+            { en: "ten", zh: "十" }, { en: "eleven", zh: "十一" }, { en: "twelve", zh: "十二" }, { en: "thirteen", zh: "十三" }, { en: "fourteen", zh: "十四" },
+            { en: "fifteen", zh: "十五" }, { en: "sixteen", zh: "十六" }, { en: "seventeen", zh: "十七" }, { en: "eighteen", zh: "十八" }, { en: "nineteen", zh: "十九" },
+            { en: "twenty", zh: "二十" }, { en: "thirty", zh: "三十" }, { en: "forty", zh: "四十" }, { en: "fifty", zh: "五十" }, { en: "sixty", zh: "六十" },
+            { en: "seventy", zh: "七十" }, { en: "eighty", zh: "八十" }, { en: "ninety", zh: "九十" }, { en: "hundred", zh: "百" },
+            // People
+            { en: "I", zh: "我" }, { en: "you", zh: "你" }, { en: "we", zh: "我們" }, { en: "they", zh: "他們" }, { en: "he", zh: "他" },
+            { en: "she", zh: "她" }, { en: "it", zh: "它" }, { en: "my", zh: "我的" }, { en: "your", zh: "你的" }, { en: "his", zh: "他的" },
+            { en: "her", zh: "她的" }, { en: "its", zh: "它的" }, { en: "grandmother", zh: "阿嬤" }, { en: "grandfather", zh: "阿公" }, { en: "mother", zh: "媽媽" },
+            { en: "father", zh: "爸爸" }, { en: "sister", zh: "姊妹" }, { en: "brother", zh: "兄弟" }, { en: "baby", zh: "嬰兒" }, { en: "girl", zh: "女孩" },
+            { en: "boy", zh: "男孩" }, { en: "woman", zh: "女人" }, { en: "man", zh: "男人" }, { en: "cook", zh: "廚師" }, { en: "teacher", zh: "老師" },
+            { en: "student", zh: "學生" }, { en: "farmer", zh: "農夫" }, { en: "doctor", zh: "醫生" }, { en: "nurse", zh: "護理師" }, { en: "driver", zh: "司機" },
+            // Body Parts
+            { en: "head", zh: "頭" }, { en: "hair", zh: "頭髮" }, { en: "eye", zh: "眼睛" }, { en: "nose", zh: "鼻子" }, { en: "mouth", zh: "嘴巴" },
+            { en: "ear", zh: "耳朵" }, { en: "hand", zh: "手" }, { en: "leg", zh: "腿" }, { en: "foot", zh: "腳" },
+            // Clothing
+            { en: "hat", zh: "帽子" }, { en: "glasses", zh: "眼鏡" }, { en: "shirt", zh: "襯衫" }, { en: "shorts", zh: "短褲" }, { en: "pants", zh: "長褲" },
+            { en: "skirt", zh: "裙子" }, { en: "dress", zh: "洋裝" }, { en: "socks", zh: "襪子" }, { en: "shoes", zh: "鞋子" }, { en: "boots", zh: "靴子" },
+            // Animals
+            { en: "bear", zh: "熊" }, { en: "dog", zh: "狗" }, { en: "cat", zh: "貓" }, { en: "bird", zh: "鳥" }, { en: "rabbit", zh: "兔子" },
+            { en: "frog", zh: "青蛙" }, { en: "fish", zh: "魚" }, { en: "chicken", zh: "雞" }, { en: "turtle", zh: "烏龜" }, { en: "lion", zh: "獅子" },
+            { en: "tiger", zh: "老虎" }, { en: "monkey", zh: "猴子" }, { en: "giraffe", zh: "長頸鹿" }, { en: "fox", zh: "狐狸" }, { en: "zebra", zh: "斑馬" },
+            { en: "pig", zh: "豬" }, { en: "elephant", zh: "大象" },
+            // Things
+            { en: "pen", zh: "原子筆" }, { en: "pencil", zh: "鉛筆" }, { en: "marker", zh: "麥克筆" }, { en: "eraser", zh: "橡皮擦" }, { en: "ruler", zh: "尺" },
+            { en: "book", zh: "書" }, { en: "bag", zh: "袋子" }, { en: "desk", zh: "書桌" }, { en: "table", zh: "餐桌" }, { en: "chair", zh: "椅子" },
+            { en: "crayon", zh: "蠟筆" }, { en: "box", zh: "箱子" }, { en: "door", zh: "門" }, { en: "window", zh: "窗戶" }, { en: "picture", zh: "圖片" },
+            { en: "TV", zh: "電視" }, { en: "sofa", zh: "沙發" }, { en: "light", zh: "燈光" }, { en: "bed", zh: "床" }, { en: "lamp", zh: "燈" },
+            { en: "clock", zh: "時鐘" }, { en: "cell phone", zh: "手機" }, { en: "video game", zh: "電動" }, { en: "computer", zh: "電腦" }, { en: "cup", zh: "杯子" },
+            { en: "mug", zh: "馬克杯" }, { en: "bowl", zh: "碗" }, { en: "ball", zh: "球" }, { en: "yo-yo", zh: "溜溜球" }, { en: "bat", zh: "球棒" },
+            { en: "robot", zh: "機器人" }, { en: "kite", zh: "風箏" }, { en: "doll", zh: "娃娃" }, { en: "mop", zh: "拖把" }, { en: "map", zh: "地圖" },
+            { en: "weather", zh: "天氣" }, { en: "sun", zh: "太陽" }, { en: "cloud", zh: "雲" }, { en: "wind", zh: "風" }, { en: "rain", zh: "雨" },
+            { en: "snow", zh: "雪" }, { en: "river", zh: "河" }, { en: "flower", zh: "花" }, { en: "grass", zh: "草" }, { en: "tree", zh: "樹" },
+            { en: "bike", zh: "腳踏車" }, { en: "car", zh: "汽車" }, { en: "bus", zh: "公車" }, { en: "train", zh: "火車" }, { en: "taxi", zh: "計程車" },
+            // Food
+            { en: "breakfast", zh: "早餐" }, { en: "lunch", zh: "午餐" }, { en: "dinner", zh: "晚餐" }, { en: "cookie", zh: "餅乾" }, { en: "ice cream", zh: "冰淇淋" },
+            { en: "candy", zh: "糖果" }, { en: "hamburger", zh: "漢堡" }, { en: "hot dog", zh: "熱狗" }, { en: "pizza", zh: "比薩" }, { en: "bread", zh: "麵包" },
+            { en: "sandwich", zh: "三明治" }, { en: "cake", zh: "蛋糕" }, { en: "rice", zh: "飯" }, { en: "noodles", zh: "麵" }, { en: "spaghetti", zh: "義大利麵" },
+            { en: "tea", zh: "茶" }, { en: "coke", zh: "可樂" }, { en: "soda", zh: "汽水" }, { en: "water", zh: "水" }, { en: "juice", zh: "果汁" },
+            { en: "milk", zh: "牛奶" }, { en: "egg", zh: "蛋" }, { en: "ham", zh: "火腿" }, { en: "salad", zh: "沙拉" }, { en: "tomato", zh: "番茄" },
+            { en: "banana", zh: "香蕉" }, { en: "apple", zh: "蘋果" }, { en: "pear", zh: "梨子" }, { en: "grape", zh: "葡萄" }, { en: "peach", zh: "桃子" },
+            // Places
+            { en: "home", zh: "家" }, { en: "school", zh: "學校" }, { en: "park", zh: "公園" }, { en: "zoo", zh: "動物園" }, { en: "store", zh: "商店" },
+            { en: "shop", zh: "商店" }, { en: "house", zh: "房子" }, { en: "garage", zh: "車庫" }, { en: "living room", zh: "客廳" }, { en: "dining room", zh: "飯廳" },
+            { en: "kitchen", zh: "廚房" }, { en: "bedroom", zh: "臥室" }, { en: "bathroom", zh: "浴室" }, { en: "yard", zh: "庭院" }, { en: "garden", zh: "花園" },
+            // Time
+            { en: "o'clock", zh: "點鐘" }, { en: "now", zh: "現在" }, { en: "morning", zh: "早上" }, { en: "afternoon", zh: "下午" }, { en: "evening", zh: "傍晚" },
+            { en: "night", zh: "晚上" }, { en: "today", zh: "今天" }, { en: "Sunday", zh: "星期天" }, { en: "Monday", zh: "星期一" }, { en: "Tuesday", zh: "星期二" },
+            { en: "Wednesday", zh: "星期三" }, { en: "Thursday", zh: "星期四" }, { en: "Friday", zh: "星期五" }, { en: "Saturday", zh: "星期六" },
+            // Verbs
+            { en: "do", zh: "做" }, { en: "like", zh: "喜歡" }, { en: "love", zh: "愛" }, { en: "want", zh: "想要" }, { en: "have", zh: "擁有" },
+            { en: "run", zh: "跑" }, { en: "walk", zh: "走路" }, { en: "swim", zh: "游泳" }, { en: "jump", zh: "跳" }, { en: "ride", zh: "騎" },
+            { en: "dance", zh: "跳舞" }, { en: "sing", zh: "唱" }, { en: "write", zh: "寫" }, { en: "read", zh: "閱讀" }, { en: "draw", zh: "畫" },
+            { en: "color", zh: "上色" }, { en: "paint", zh: "畫" }, { en: "speak", zh: "說" }, { en: "say", zh: "說" }, { en: "eat", zh: "吃" },
+            { en: "drink", zh: "喝" }, { en: "look", zh: "看" }, { en: "watch", zh: "看" }, { en: "see", zh: "看" }, { en: "listen", zh: "聽" },
+            { en: "smile", zh: "微笑" }, { en: "laugh", zh: "大笑" }, { en: "cry", zh: "哭" }, { en: "hold", zh: "拿" }, { en: "put", zh: "放" },
+            { en: "take", zh: "拿" }, { en: "sit", zh: "坐" }, { en: "stand", zh: "站" },
+            // Adjectives
+            { en: "fine", zh: "好的" }, { en: "good", zh: "好的" }, { en: "bad", zh: "壞的" }, { en: "favorite", zh: "最喜歡的" }, { en: "big", zh: "大的" },
+            { en: "small", zh: "小的" }, { en: "little", zh: "小的" }, { en: "old", zh: "老的" }, { en: "young", zh: "年輕的" }, { en: "tall", zh: "高的" },
+            { en: "long", zh: "長的" }, { en: "short", zh: "短的" }, { en: "thin", zh: "瘦的" }, { en: "fat", zh: "胖的" }, { en: "fast", zh: "快的" },
+            { en: "slow", zh: "慢的" }, { en: "clean", zh: "乾淨的" }, { en: "dirty", zh: "髒的" }, { en: "hungry", zh: "餓的" }, { en: "thirsty", zh: "渴的" },
+            { en: "happy", zh: "開心的" }, { en: "unhappy", zh: "不開心的" }, { en: "sad", zh: "傷心的" }, { en: "angry", zh: "生氣的" }, { en: "sick", zh: "生病的" },
+            { en: "tired", zh: "累的" }, { en: "hot", zh: "熱的" }, { en: "cold", zh: "冷的" }, { en: "rainy", zh: "下雨的" }, { en: "snowy", zh: "下雪的" },
+            { en: "sunny", zh: "晴朗的" }, { en: "cloudy", zh: "多雲的" }, { en: "windy", zh: "起風的" }, { en: "black", zh: "黑色的" }, { en: "white", zh: "白色的" },
+            { en: "gray", zh: "灰色的" }, { en: "brown", zh: "咖啡色的" }, { en: "red", zh: "紅色的" }, { en: "orange", zh: "橘色的" }, { en: "yellow", zh: "黃色的" },
+            { en: "green", zh: "綠色的" }, { en: "blue", zh: "藍色的" }, { en: "purple", zh: "紫色的" }, { en: "pink", zh: "粉紅色的" },
+            // Prepositions
+            { en: "at", zh: "在...地點" }, { en: "in", zh: "在...裡面" }, { en: "on", zh: "在...上面" }, { en: "under", zh: "在...下面" }, { en: "by", zh: "在...旁邊" },
+            { en: "beside", zh: "在...旁邊" }, { en: "behind", zh: "在...後面" },
+            // Question Words
+            { en: "who", zh: "誰" }, { en: "what", zh: "什麼" }, { en: "when", zh: "何時" }, { en: "where", zh: "哪裡" }, { en: "which", zh: "哪一個" },
+            { en: "why", zh: "為什麼" }, { en: "how", zh: "如何" }
+        ];
+
+        let state = {
+            gameState: 'start',
+            shuffledQueue: [],
+            currentIndex: 0,
+            score: 0,
+            wrongAttempts: [],
+            startTime: null,
+            elapsedTime: 0,
+            feedback: null,
+            targetScore: 20
+        };
+
+        let timerInterval = null;
+
+        function render() {
+            const app = document.getElementById('app');
+            
+            if (state.gameState === 'start') {
+                app.innerHTML = `
+                    <div class="bg-stone-100 p-8 text-stone-600 text-center border-b border-stone-200">
+                        <div class="inline-flex p-3 bg-white rounded-full shadow-inner mb-3">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-stone-400"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="6" y1="9" x2="6" y2="9"></line><line x1="10" y1="9" x2="10" y2="9"></line><line x1="14" y1="9" x2="14" y2="9"></line><line x1="18" y1="9" x2="18" y2="9"></line><line x1="6" y1="13" x2="6" y2="13"></line><line x1="10" y1="13" x2="10" y2="13"></line><line x1="14" y1="13" x2="14" y2="13"></line><line x1="18" y1="13" x2="18" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line></svg>
+                        </div>
+                        <h1 class="text-xl font-bold tracking-tight">國小單字 300 挑戰</h1>
+                    </div>
+                    <div class="p-10 text-center">
+                        <div class="w-24 h-24 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-8 text-orange-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-4">準備好開始挑戰嗎？</h2>
+                        <p class="text-stone-400 text-sm mb-10 leading-relaxed">
+                            每次遊戲會從 300 個國小必學單字中<br/>隨機抽取 ${state.targetScore} 題。
+                        </p>
+                        <button onclick="startGame()" class="w-full bg-stone-800 hover:bg-stone-700 text-stone-50 font-bold py-5 px-8 rounded-3xl transition-all shadow-lg active:scale-95">
+                            開始練習
+                        </button>
+                    </div>
+                `;
+            } else if (state.gameState === 'playing') {
+                const currentWord = state.shuffledQueue[state.currentIndex];
+                app.innerHTML = `
+                    <div class="bg-stone-100 p-8 text-stone-600 text-center border-b border-stone-200">
+                        <div class="inline-flex p-3 bg-white rounded-full shadow-inner mb-3">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-stone-400"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="6" y1="9" x2="6" y2="9"></line><line x1="10" y1="9" x2="10" y2="9"></line><line x1="14" y1="9" x2="14" y2="9"></line><line x1="18" y1="9" x2="18" y2="9"></line><line x1="6" y1="13" x2="6" y2="13"></line><line x1="10" y1="13" x2="10" y2="13"></line><line x1="14" y1="13" x2="14" y2="13"></line><line x1="18" y1="13" x2="18" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line></svg>
+                        </div>
+                        <h1 class="text-xl font-bold tracking-tight">國小單字 300 挑戰</h1>
+                    </div>
+                    <div class="p-8">
+                        <div class="flex justify-between items-center mb-10 font-bold text-stone-500 text-xs">
+                            <div class="flex items-center gap-1.5 px-3 py-1 bg-stone-50 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> 
+                                <span id="timer-display">${formatTime(state.elapsedTime)}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-3 py-1 bg-stone-50 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                ${state.score} / ${state.targetScore}
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-10">
+                            <div class="inline-block px-3 py-1 bg-stone-100 rounded-full text-stone-400 text-[10px] font-bold mb-4 uppercase tracking-wider">中文題目</div>
+                            <h2 class="text-5xl font-black text-stone-800 tracking-tighter">${currentWord.zh}</h2>
+                        </div>
+
+                        <form id="answer-form" class="space-y-4">
+                            <input
+                                id="user-input"
+                                type="text"
+                                placeholder="請輸入英文..."
+                                class="w-full text-center text-3xl py-6 px-6 bg-stone-50 border-4 border-transparent focus:border-stone-100 focus:bg-white rounded-[2rem] outline-none transition-all placeholder:text-stone-200 text-stone-700 font-medium"
+                                autocomplete="off"
+                                ${state.feedback ? 'disabled' : ''}
+                            />
+                            <button 
+                                type="submit"
+                                ${state.feedback ? 'disabled' : ''}
+                                class="w-full font-bold py-5 rounded-[2rem] transition-all shadow-md flex items-center justify-center gap-2 bg-stone-800 hover:bg-stone-900 text-white"
+                            >
+                                檢查答案
+                            </button>
+                        </form>
+
+                        <div class="h-20 mt-4 flex items-center justify-center" id="feedback-area">
+                            ${state.feedback ? `
+                                <div class="p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 ${state.feedback.type === 'success' ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50'}">
+                                    ${state.feedback.type === 'success' ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>'}
+                                    <p class="font-bold text-sm leading-relaxed">${state.feedback.message}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                const form = document.getElementById('answer-form');
+                const input = document.getElementById('user-input');
+                if (input && !state.feedback) input.focus();
+                
+                form.onsubmit = (e) => {
+                    e.preventDefault();
+                    const val = input.value.trim().toLowerCase();
+                    if (!val || state.feedback) return;
+                    
+                    if (val === currentWord.en.toLowerCase()) {
+                        handleCorrect();
+                    } else {
+                        handleWrong(val);
+                    }
+                };
+            } else if (state.gameState === 'finished') {
+                const avg = (state.elapsedTime / state.targetScore).toFixed(1);
+                app.innerHTML = `
+                    <div class="p-8 max-h-[85vh] overflow-y-auto custom-scrollbar">
+                        <div class="text-center mb-10 mt-4">
+                            <div class="inline-block p-6 bg-stone-50 rounded-full text-stone-300 mb-6 border border-stone-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                            </div>
+                            <h2 class="text-3xl font-black text-stone-800">完成挑戰！</h2>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-stone-50 p-6 rounded-3xl text-center border border-stone-100">
+                                <p class="text-[10px] text-stone-400 font-black uppercase mb-1 tracking-widest">總時間</p>
+                                <p class="text-xl font-black text-stone-700">${formatTime(state.elapsedTime)}</p>
+                            </div>
+                            <div class="bg-stone-50 p-6 rounded-3xl text-center border border-stone-100">
+                                <p class="text-[10px] text-stone-400 font-black uppercase mb-1 tracking-widest">答對題數</p>
+                                <p class="text-xl font-black text-stone-700">${state.score} / ${state.targetScore}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-stone-800 p-6 rounded-3xl text-center mb-8 shadow-inner flex items-center justify-between">
+                            <div class="flex items-center gap-3 text-stone-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-left">平均一題<br/>作答時間</p>
+                            </div>
+                            <p class="text-2xl font-black text-white">${avg}s</p>
+                        </div>
+
+                        <div class="mb-10">
+                            <h3 class="font-bold text-stone-600 mb-4 px-2 flex justify-between">
+                                <span>錯題回顧</span>
+                                <span class="text-stone-400 text-xs">${state.wrongAttempts.length} 題</span>
+                            </h3>
+                            ${state.wrongAttempts.length > 0 ? `
+                                <div class="space-y-3">
+                                    ${state.wrongAttempts.map(a => `
+                                        <div class="bg-white p-4 rounded-2xl border border-stone-100 shadow-sm flex flex-col gap-1">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-bold text-stone-700">${a.question}</span>
+                                                <span class="text-xs text-red-400 line-through">${a.user || '(未填寫)'}</span>
+                                            </div>
+                                            <div class="text-[9px] text-stone-300 font-black uppercase tracking-widest mt-1">正確應為</div>
+                                            <span class="font-mono font-black text-stone-800 uppercase text-lg">${a.correct}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : `
+                                <div class="bg-stone-50 p-8 rounded-3xl text-center border-2 border-dashed border-stone-200 text-stone-400 text-sm italic">
+                                    完美通關！沒有任何錯誤。
+                                </div>
+                            `}
+                        </div>
+
+                        <button onclick="startGame()" class="w-full bg-stone-800 text-white font-bold py-5 rounded-[2rem] flex items-center justify-center gap-2 active:scale-95 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 16h5v5"></path></svg>
+                            再玩一次
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function startGame() {
+            const shuffled = [...wordBank].sort(() => Math.random() - 0.5);
+            state = {
+                ...state,
+                gameState: 'playing',
+                shuffledQueue: shuffled,
+                currentIndex: 0,
+                score: 0,
+                wrongAttempts: [],
+                startTime: Date.now(),
+                elapsedTime: 0,
+                feedback: null
+            };
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                state.elapsedTime = Math.floor((Date.now() - state.startTime) / 1000);
+                const timerEl = document.getElementById('timer-display');
+                if (timerEl) timerEl.innerText = formatTime(state.elapsedTime);
+            }, 1000);
+            
+            render();
+        }
+
+        function handleCorrect() {
+            state.feedback = { type: 'success', message: '答對囉！ ✨' };
+            state.score++;
+            render();
+            
+            setTimeout(() => {
+                if (state.score >= state.targetScore || state.currentIndex >= state.shuffledQueue.length - 1) {
+                    finishGame();
+                } else {
+                    state.currentIndex++;
+                    state.feedback = null;
+                    render();
+                }
+            }, 800);
+        }
+
+        function handleWrong(userInput) {
+            const word = state.shuffledQueue[state.currentIndex];
+            state.feedback = { type: 'error', message: `答錯了！正確答案是：${word.en}` };
+            state.wrongAttempts.push({
+                question: word.zh,
+                correct: word.en,
+                user: userInput
+            });
+            render();
+            
+            setTimeout(() => {
+                if (state.currentIndex >= state.shuffledQueue.length - 1) {
+                    finishGame();
+                } else {
+                    state.currentIndex++;
+                    state.feedback = null;
+                    render();
+                }
+            }, 2000);
+        }
+
+        function finishGame() {
+            state.gameState = 'finished';
+            clearInterval(timerInterval);
+            render();
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}分${secs}秒`;
+        }
+
+        // 初始化
+        render();
+    </script>
+</body>
+</html>
